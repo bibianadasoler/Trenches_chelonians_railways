@@ -6,7 +6,7 @@ library(tidyverse)
 library(magick)
 library(cowplot)
 
-general_data <- read.csv(here::here("SM2_trench_trials.csv"), sep = ";")
+general_data <- read.csv(here::here("SM3_trench_trials.csv"), sep = ";")
 tortoise <- image_read(here::here("tortoise.png"))
 trachemys <- image_read(here::here("trachemys.png"))
 
@@ -37,7 +37,7 @@ T2_Slider_proportion <- type_2_data %>%
   mutate(proportion = frequency / sum(frequency) * 100) %>%
   ungroup() %>%
   mutate(exit_way = factor(exit_way, levels = c("trench", "rail", "barrier", "unable"),
-                        labels = c("Trench", "Tracks", "Barrier", "No exit"))) %>%
+                        labels = c("Trench", "Rails", "Barrier", "No exit"))) %>%
   tidyr::complete(exit_way, fill = list(frequency = 0, proportion = 0))
 
 T2_Tortoise_proportion <- type_2_data %>%
@@ -47,7 +47,7 @@ T2_Tortoise_proportion <- type_2_data %>%
   mutate(proportion = frequency / sum(frequency) * 100) %>%
   ungroup() %>%
   mutate(exit_way = factor(exit_way, levels = c("trench", "rail", "barrier", "unable"),
-                        labels = c("Trench", "Tracks", "Barrier", "No exit")))
+                        labels = c("Trench", "Rails", "Barrier", "No exit")))
 
 NoTrench_Slider_proportion <- no_trench_data %>%
   filter(species == "Trachemys") %>%
@@ -85,31 +85,27 @@ NoTrench_Tortoise_proportion <- no_trench_data %>%
           panel.grid.major.x = element_blank(),
           panel.grid.minor = element_blank()) )
 T1_T_image <- ggdraw() +
-  draw_image(tortoise, x = 0.27, y = 0, width = 0.5, height = 0.5) + 
-  draw_label("Type 1 (n = 57)", x = 0.08, y = 0.25, hjust = 0, size = 17)
+  draw_image(tortoise, x = 0.34, y = 0, width = 0.5, height = 0.5) + 
+  draw_label("A) Type 1 (n = 57)", x = 0.08, y = 0.25, hjust = 0, size = 17)
 (T1_T_final <- plot_grid(T1_T_image, T1_T, ncol = 1,  rel_heights = c(0.2, 1)) )
-
-ggsave(filename = here::here("figures", "T1_escape.jpg"),  plot = T1_T_final,  
-       width = 5, height = 6, units = "in", dpi = 300)
-
 
 
 (T2_S <- ggplot(T2_Slider_proportion, aes(x = exit_way, y = proportion, fill = exit_way)) +
     geom_bar(stat = "identity", position = "dodge", width = 0.4) +
-    labs(x = "Exit way",  y = "Exit proportion in the trials") +
+    labs(x = "Exit way",  y = " ") +
     scale_y_continuous(labels = scales::percent_format(scale = 1), limits = c(0,100)) +
     scale_fill_manual(values = c("#08589e", "#2b8cbe", "#4eb3d3", "#FFCC99")) +
     theme_minimal() +
     theme(legend.position = "none",
-          axis.text.y = element_text(size = 18.5),
           axis.title = element_text(size = 18),
           axis.text.x = element_text(size = 16.5, vjust = 4),
+          axis.text.y = element_blank(),
           plot.title = element_text(size = 19),
           panel.grid.major.x = element_blank(),
           panel.grid.minor = element_blank()) )
 T2_S_image <- ggdraw() +
-  draw_image(trachemys, x = 0.29, y = 0, width = 0.55, height = 0.55) + 
-  draw_label("A) Type 2 (n = 60)", x = 0.08, y = 0.25, hjust = 0, size = 17)
+  draw_image(trachemys, x = 0.30, y = 0, width = 0.55, height = 0.55) + 
+  draw_label("B) Type 2 (n = 60)", x = 0.08, y = 0.25, hjust = 0, size = 17)
 (T2_S_final <- plot_grid(T2_S_image, T2_S, ncol = 1,  rel_heights = c(0.2, 1)) )
 
 (T2_T <- ggplot(T2_Tortoise_proportion, aes(x = exit_way, y = proportion, fill = exit_way)) +
@@ -126,11 +122,13 @@ T2_S_image <- ggdraw() +
           panel.grid.major.x = element_blank(),
           panel.grid.minor = element_blank()) )
 T2_T_image <- ggdraw() +
-  draw_image(tortoise, x = 0.32, y = 0, width = 0.5, height = 0.5) + 
-  draw_label("B) Type 2 (n = 33)", x = 0.08, y = 0.25, hjust = 0, size = 17)
+  draw_image(tortoise, x = 0.34, y = 0, width = 0.5, height = 0.5) + 
+  draw_label("C) Type 2 (n = 33)", x = 0.08, y = 0.25, hjust = 0, size = 17)
 (T2_T_final <- plot_grid(T2_T_image, T2_T, ncol = 1,  rel_heights = c(0.2, 1)) )
 
-panel_P2 <- (T2_S_final | T2_T_final)
-panel_P2
-ggsave(filename = here::here("figures", "T2_escape.png"),  plot = panel_P2,  
-       width = 10, height = 6, units = "in", dpi = 300)
+
+panel_P3 <- (T1_T_final | T2_S_final | T2_T_final)
+panel_P3
+
+ggsave(filename = here::here("figures", "Fig2.png"),  plot = panel_P3,  
+       width = 14, height = 6, units = "in", dpi = 300)
